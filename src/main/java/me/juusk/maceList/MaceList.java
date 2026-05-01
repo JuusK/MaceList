@@ -5,6 +5,7 @@ import de.tr7zw.nbtapi.iface.ReadWriteNBT;
 import me.juusk.maceList.command.MaceListCommand;
 import me.juusk.maceList.command.PurgeCommand;
 import me.juusk.maceList.expansion.PlaceholderAPIExpansion;
+import me.juusk.maceList.listener.MaceLimiterListener;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -18,13 +19,19 @@ import java.util.List;
 import java.util.UUID;
 
 public final class MaceList extends JavaPlugin {
-
     public static MaceList INSTANCE;
+    public static MaceLimiterListener listener;
+
     @Override
     public void onEnable() {
         INSTANCE = this;
+        saveDefaultConfig();
         getCommand("macelist").setExecutor(new MaceListCommand());
         getCommand("purgemaces").setExecutor(new PurgeCommand());
+        if(getConfig().getBoolean("macelimiter.enabled")) {
+            listener = new MaceLimiterListener();
+        }
+
         if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new PlaceholderAPIExpansion().register();
         }
