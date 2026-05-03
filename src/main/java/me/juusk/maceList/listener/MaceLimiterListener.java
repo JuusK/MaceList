@@ -26,6 +26,11 @@ public class MaceLimiterListener implements Listener {
         ItemStack cursor = event.getCursor();
         ItemStack current = event.getCurrentItem();
 
+        if (current != null && isBundle(current)) {
+            if (cursor != null && isMace(cursor)) {
+                event.setCancelled(true);
+            }
+        }
 
         if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
             ItemStack item = event.getCurrentItem();
@@ -118,6 +123,29 @@ public class MaceLimiterListener implements Listener {
                 && type != InventoryType.STONECUTTER
                 && type != InventoryType.LOOM
                 && type != InventoryType.CARTOGRAPHY;
+    }
+
+    private boolean isBundle(ItemStack item) {
+        if (item == null) return false;
+
+        Material type = item.getType();
+        return type == Material.BUNDLE
+                || type == Material.WHITE_BUNDLE
+                || type == Material.ORANGE_BUNDLE
+                || type == Material.MAGENTA_BUNDLE
+                || type == Material.LIGHT_BLUE_BUNDLE
+                || type == Material.YELLOW_BUNDLE
+                || type == Material.LIME_BUNDLE
+                || type == Material.PINK_BUNDLE
+                || type == Material.GRAY_BUNDLE
+                || type == Material.LIGHT_GRAY_BUNDLE
+                || type == Material.CYAN_BUNDLE
+                || type == Material.PURPLE_BUNDLE
+                || type == Material.BLUE_BUNDLE
+                || type == Material.BROWN_BUNDLE
+                || type == Material.GREEN_BUNDLE
+                || type == Material.RED_BUNDLE
+                || type == Material.BLACK_BUNDLE;
     }
 
 }
