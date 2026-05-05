@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -17,6 +19,13 @@ public class MaceLimiterListener implements Listener {
         Bukkit.getPluginManager().registerEvents(this, MaceList.INSTANCE);
     }
 
+    @EventHandler
+    public void onInteract(PlayerInteractEvent event) {
+        ItemStack offhand = event.getPlayer().getInventory().getItemInOffHand();
+        if (offhand != null && isMace(offhand)) {
+            event.setCancelled(true);
+        }
+    }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
@@ -25,9 +34,22 @@ public class MaceLimiterListener implements Listener {
 
         ItemStack cursor = event.getCursor();
         ItemStack current = event.getCurrentItem();
+        if(event.getClick() == ClickType.SWAP_OFFHAND) {
+            ItemStack offhand = player.getInventory().getItemInOffHand();
+            if(isMace(current) || isMace(offhand)) {
+                event.setCancelled(true);
+            }
 
-        if (current != null && isBundle(current)) {
-            if (cursor != null && isMace(cursor)) {
+        }
+        if (event.getSlot() == 40) {
+
+            if ((cursor != null && isMace(cursor)) ||
+                    (current != null && isMace(current))) {
+                event.setCancelled(true);
+            }
+        }
+        if (current != null && isBundle(current) || isMace(current)) {
+            if (cursor != null && isMace(cursor) || isBundle(cursor)) {
                 event.setCancelled(true);
             }
         }
@@ -71,13 +93,24 @@ public class MaceLimiterListener implements Listener {
             }
         }
     }
+
+    @EventHandler
+    public void onSwap(PlayerSwapHandItemsEvent event) {
+        if(isMace(event.getOffHandItem())) {
+            event.setCancelled(true);
+        }
+    }
+
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
         if (!MaceList.INSTANCE.getConfig().getBoolean("macelimiter.disable-mace-storage")) return;
 
         ItemStack cursor = event.getOldCursor();
         if (!isMace(cursor)) return;
-
+        if (event.getInventorySlots().contains(40)) {
+            event.setCancelled(true);
+            return;
+        }
         int topSize = event.getView().getTopInventory().getSize();
 
         for (int slot : event.getRawSlots()) {
