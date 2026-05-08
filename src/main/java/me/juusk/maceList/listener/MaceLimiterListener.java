@@ -3,13 +3,15 @@ package me.juusk.maceList.listener;
 import me.juusk.maceList.MaceList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -121,6 +123,30 @@ public class MaceLimiterListener implements Listener {
         }
     }
     @EventHandler
+    public void onInteractEntity(PlayerInteractEntityEvent event) {
+        if (!MaceList.INSTANCE.getConfig().getBoolean("macelimiter.disable-mace-storage")) return;
+
+        if (!(isStorage(event.getRightClicked()))) return;
+
+        ItemStack held = event.getPlayer().getInventory().getItem(event.getHand());
+
+        if (isMace(held)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityPickup(EntityPickupItemEvent event) {
+        if (!MaceList.INSTANCE.getConfig().getBoolean("macelimiter.disable-mace-storage")) return;
+
+        ItemStack item = event.getItem().getItemStack();
+
+        if (isMace(item) && isStorage(event.getEntity())) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
     public void onInventoryMoveItem(InventoryMoveItemEvent event) {
         if (!MaceList.INSTANCE.getConfig().getBoolean("macelimiter.disable-mace-storage")) return;
 
@@ -156,6 +182,14 @@ public class MaceLimiterListener implements Listener {
                 && type != InventoryType.STONECUTTER
                 && type != InventoryType.LOOM
                 && type != InventoryType.CARTOGRAPHY;
+    }
+
+    private boolean isStorage(Entity type) {
+        return (type instanceof ItemFrame
+                || type instanceof Allay
+                || type instanceof ArmorStand
+                || type instanceof Fox
+        );
     }
 
     private boolean isBundle(ItemStack item) {
