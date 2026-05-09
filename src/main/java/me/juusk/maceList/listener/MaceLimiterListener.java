@@ -3,10 +3,12 @@ package me.juusk.maceList.listener;
 import me.juusk.maceList.MaceList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
@@ -24,6 +26,13 @@ public class MaceLimiterListener implements Listener {
         ItemStack offhand = event.getPlayer().getInventory().getItemInOffHand();
         if (offhand != null && isMace(offhand)) {
             event.setCancelled(true);
+        }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = event.getClickedBlock();
+            if (block != null && block.getType() == Material.CHISELED_BOOKSHELF && isMace(event.getItem())) {
+                event.setCancelled(true);
+            }
         }
     }
 
@@ -100,6 +109,8 @@ public class MaceLimiterListener implements Listener {
             event.setCancelled(true);
         }
     }
+
+
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
