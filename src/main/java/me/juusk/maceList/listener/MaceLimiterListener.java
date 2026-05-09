@@ -3,9 +3,11 @@ package me.juusk.maceList.listener;
 import me.juusk.maceList.MaceList;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -26,6 +28,15 @@ public class MaceLimiterListener implements Listener {
         ItemStack offhand = event.getPlayer().getInventory().getItemInOffHand();
         if (offhand != null && isMace(offhand)) {
             event.setCancelled(true);
+        }
+
+        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = event.getClickedBlock();
+            if (block != null && isShelf(block.getType())) {
+                if(isMace(event.getItem())) {
+                    event.setCancelled(true);
+                }
+            }
         }
     }
 
@@ -213,6 +224,21 @@ public class MaceLimiterListener implements Listener {
                 || type == Material.GREEN_BUNDLE
                 || type == Material.RED_BUNDLE
                 || type == Material.BLACK_BUNDLE;
+    }
+    private boolean isShelf(Material type) {
+        return type == Material.ACACIA_SHELF
+                || type == Material.BAMBOO_SHELF
+                || type == Material.BIRCH_SHELF
+                || type == Material.SPRUCE_SHELF
+                || type == Material.CHERRY_SHELF
+                || type == Material.CRIMSON_SHELF
+                || type == Material.JUNGLE_SHELF
+                || type == Material.OAK_SHELF
+                || type == Material.MANGROVE_SHELF
+                || type == Material.WARPED_SHELF
+                || type == Material.DARK_OAK_SHELF
+                || type == Material.PALE_OAK_SHELF
+                || type == Material.CHISELED_BOOKSHELF;
     }
 
 }
