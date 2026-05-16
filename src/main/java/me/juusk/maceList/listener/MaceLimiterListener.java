@@ -32,7 +32,7 @@ public class MaceLimiterListener implements Listener {
 
         if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
             Block block = event.getClickedBlock();
-            if (block != null && isShelf(block.getType())) {
+            if (block != null && (isShelf(block.getType()) || isPot(block.getType()))) {
                 if(isMace(event.getItem())) {
                     event.setCancelled(true);
                 }
@@ -239,6 +239,10 @@ public class MaceLimiterListener implements Listener {
                 || type == Material.DARK_OAK_SHELF
                 || type == Material.PALE_OAK_SHELF
                 || type == Material.CHISELED_BOOKSHELF;
+    }
+
+    private boolean isPot(Material type) {
+        return type == Material.DECORATED_POT;
     }
 
 }
